@@ -95,7 +95,7 @@ const AddUser = ({ open, handleClose }) => {
               onChange={handleChange}
             >
               <MenuItem value={"contributor"}>contributor</MenuItem>
-              <MenuItem value={"cont"}>cont</MenuItem>
+              <MenuItem value={"owner"}>Owner</MenuItem>
             </Select>
           </FormControl>
         </DialogContent>
