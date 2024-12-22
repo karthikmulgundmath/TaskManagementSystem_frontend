@@ -72,7 +72,9 @@ const ProjectView = () => {
 
   const onClickOnDelete = async (event, taskDetails) => {
     event.stopPropagation();
-    await APICalls.deleteDetails(`http://localhost:3000/task/${taskDetails.id}`)
+    await APICalls.deleteDetails(
+      `http://localhost:3000/tasks/${taskDetails.id}`
+    )
       .then((res) => {
         if (res.status === 200) {
           getTaskDetails();

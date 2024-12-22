@@ -28,23 +28,40 @@ const AddTask = ({
   const [taskDetails, setTaskDetails] = useState({
     title: "",
     description: "",
-    status: "completed",
+    status: "in_progress",
     priority: "high",
     due_date: dayjs(new Date()),
+    assigned_user_id: "",
   });
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     if (selectedTask?.title) {
+      console.log(selectedTask, "selectedTask");
       setTaskDetails({
         title: selectedTask?.title,
         description: selectedTask?.description,
         status: selectedTask?.status,
         priority: selectedTask?.priority,
         due_date: selectedTask?.due_date,
+        assigned_user_id: selectedTask?.assigned_user_id,
       });
     }
+    getUserDetails();
   }, [selectedTask]);
 
+  const getUserDetails = async () => {
+    await APICalls.getDetails("http://localhost:3000/users")
+      .then((res) => {
+        if (res.status === 200) {
+          console.log(res, "sss");
+          setUsers(res?.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   const handleChange = (event) => {
     setTaskDetails({
       ...taskDetails,
@@ -63,15 +80,14 @@ const AddTask = ({
     const payload = {
       ...taskDetails,
       project_id: selectedProjectDetails.id,
-      assigned_user_id: "8a23c69b-b7d7-4d3b-aaa1-22cc75f8b7a9",
     };
     if (selectedTask?.title) {
       await APICalls.updateDetails(
-        `http://localhost:3000/task/${selectedTask.id}`,
+        `http://localhost:3000/tasks/${selectedTask.id}`,
         payload
       )
         .then((res) => {
-          if (res.status === 201) {
+          if (res.status === 200) {
             handleClose(res.data);
           }
         })
@@ -134,7 +150,7 @@ const AddTask = ({
               name="status"
               onChange={handleChange}
             >
-              <MenuItem value={"inProgress"}>InProgress</MenuItem>
+              <MenuItem value={"in_progress"}>InProgress</MenuItem>
               <MenuItem value={"pending"}>Pending</MenuItem>
               <MenuItem value={"completed"}>Completed</MenuItem>
             </Select>
@@ -152,6 +168,27 @@ const AddTask = ({
               <MenuItem value={"high"}>High</MenuItem>
               <MenuItem value={"low"}>Low</MenuItem>
               <MenuItem value={"medium"}>Medium</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth sx={{ mt: 2.5 }}>
+            <InputLabel id="demo-simple-select-label">
+              Select Task Owner
+            </InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={taskDetails.assigned_user_id}
+              label="Select Task Owner"
+              name="assigned_user_id"
+              onChange={handleChange}
+            >
+              {users?.map((user, index) => {
+                return (
+                  <MenuItem key={index} value={user.id}>
+                    {user.email}
+                  </MenuItem>
+                );
+              })}
             </Select>
           </FormControl>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
